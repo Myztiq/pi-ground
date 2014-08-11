@@ -8,6 +8,7 @@ ledStatus = false
 gpio.setup ledPin, gpio.DIR_OUT, ->
 
   gpio.on 'change', (channel, value)->
+    console.log('Channel ' + channel + ' value is now ' + value);
     if channel == buttonPin
       ledStatus = !ledStatus
       gpio.write ledPin, ledStatus, (err)->
@@ -15,10 +16,7 @@ gpio.setup ledPin, gpio.DIR_OUT, ->
         if err
           console.log 'Error turning pin on', err
 
-
-    console.log('Channel ' + channel + ' value is now ' + value);
-
-  gpio.setup(buttonPin, gpio.DIR_IN);
+  gpio.setup(buttonPin, gpio.DIR_IN, ->);
 
   gpio.write ledPin, true, (err)->
     console.log 'On'
