@@ -9,19 +9,13 @@ gpio.open pin, 'out up', (err)->
 
   setInterval ->
     count++
-    if count % 2 == 0
-      gpio.write pin, true, (err)->
-        console.log 'On'
-        if err
-          console.log 'Error turning pin on', err
-    else
-      gpio.write pin, false, (err)->
-        console.log 'Off'
-        if err
-          console.log 'Error turning pin off', err
-  , 100
+    value = count % 2 == 0
+    gpio.write pin, value, (err)->
+      console.log 'Error turning pin on', err if err
+  , 50
 
 process.on 'SIGINT', ->
-  gpio.close(pin) ->
-    console.log 'Cleaned up pins';
-    process.exit();
+  gpio.write pin, true, (err)->
+    gpio.close(pin) ->
+      console.log 'Cleaned up pins';
+      process.exit();
