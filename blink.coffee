@@ -13,10 +13,12 @@ setInterval ->
   count++
   if count % 2 == 0
     gpio.write pin, true, (err)->
+      console.log 'On'
       if err
         console.log 'Error turning pin on', err
   else
     gpio.write pin, false, (err)->
+      console.log 'Off'
       if err
         console.log 'Error turning pin off', err
 , 1000
