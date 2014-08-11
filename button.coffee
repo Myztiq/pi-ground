@@ -4,13 +4,9 @@ pin = 7
 
 gpio.setup pin, gpio.DIR_OUT, ->
   gpio.write pin, true, (err)->
+    console.log 'On'
     if err
-      console.log "ERROR: ", err
-
-gpio.write pin, true, (err)->
-  console.log 'On'
-  if err
-    console.log 'Error turning pin on', err
+      console.log 'Error turning pin on', err
 
 
 process.on 'SIGINT', ->
