@@ -1,9 +1,26 @@
 gpio = require 'rpi-gpio'
 
-pin = 7
+ledPin = 7
+buttonPin = 11
 
-gpio.setup pin, gpio.DIR_OUT, ->
-  gpio.write pin, true, (err)->
+ledStatus = false
+
+gpio.setup ledPin, gpio.DIR_OUT, ->
+
+  gpio.on 'change', (channel, value)->
+    if channel == buttonPin
+      ledStatus = !ledStatus
+      gpio.write ledPin, ledStatus, (err)->
+        console.log 'On'
+        if err
+          console.log 'Error turning pin on', err
+
+
+    console.log('Channel ' + channel + ' value is now ' + value);
+
+  gpio.setup(buttonPin, gpio.DIR_IN);
+
+  gpio.write ledPin, true, (err)->
     console.log 'On'
     if err
       console.log 'Error turning pin on', err
