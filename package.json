@@ -1,0 +1,22 @@
+{
+  "name": "pi-ground",
+  "version": "0.0.0",
+  "description": "Playground for rasberry pi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Myztiq/pi-ground.git"
+  },
+  "author": "Ryan Kahn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Myztiq/pi-ground/issues"
+  },
+  "dependencies": {
+    "coffee-script": "~1.7.1",
+    "rpi-gpio": "~0.5.0"
+  }
+}
