@@ -19,7 +19,7 @@ gpio.open pin, 'out up', (err)->
         console.log 'Off'
         if err
           console.log 'Error turning pin off', err
-  , 1000
+  , 100
 
 process.on 'SIGINT', ->
   gpio.close(pin) ->
