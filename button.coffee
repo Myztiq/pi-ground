@@ -1,31 +1,41 @@
-gpio = require 'rpi-gpio'
+gpio = require 'pi-gpio'
 
-ledPin = 7
+pin = 7
 buttonPin = 11
 
-ledStatus = false
+poll = null
 
-gpio.on 'change', (channel, value)->
-  console.log('Channel ' + channel + ' value is now ' + value);
-  if channel == buttonPin
-    ledStatus = !ledStatus
-    gpio.write ledPin, ledStatus, (err)->
-      console.log 'On'
-      if err
-        console.log 'Error turning pin on', err
+current = true
+status = true
 
-gpio.setup ledPin, gpio.DIR_OUT, ->
-  gpio.write ledPin, true, (err)->
-    console.log 'On'
-    if err
-      console.log 'Error turning pin on', err
+gpio.open pin, 'out up', (err)->
+  console.log 'Error setting up led pin', err if err
 
-gpio.setup buttonPin, gpio.DIR_IN, (err)->
-  if err
-    console.log "Error setting up IN on button", err
+  gpio.open buttonPin, 'in down', (err)->
+    console.log 'Error setting up button pin', err if err
 
+
+    poll = setInterval ->
+      gpio.read buttonPin, (err, val)->
+        console.log "error reading button pin", err if err
+
+        if val != current
+          current = val
+          console.log 'Button status', val
+          if val == 0
+            status = !status
+            console.log 'Status Changed to ', status
+            gpio.write pin, status, (err)->
+              console.log 'Error', err if err
+
+    , 10
 
 process.on 'SIGINT', ->
-  gpio.destroy ->
-    console.log 'Cleaned up pins';
-    process.exit();
+  console.log 'Cleaing up..'
+  clearInterval(poll)
+  gpio.write pin, true, (err)->
+    console.log err if err
+    gpio.close pin, ->
+      gpio.close buttonPin, ->
+        console.log 'Cleaned up pins';
+        process.exit()
