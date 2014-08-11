@@ -16,12 +16,14 @@ gpio.setup ledPin, gpio.DIR_OUT, ->
         if err
           console.log 'Error turning pin on', err
 
-  gpio.setup(buttonPin, gpio.DIR_IN, ->);
-
   gpio.write ledPin, true, (err)->
     console.log 'On'
     if err
       console.log 'Error turning pin on', err
+
+gpio.setup buttonPin, gpio.DIR_IN, (err)->
+  if err
+    console.log "Error setting up IN on button", err
 
 
 process.on 'SIGINT', ->
