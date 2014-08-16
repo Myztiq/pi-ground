@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "coffee-script": "~1.7.1",
-    "pi-gpio": "0.0.6"
+    "pi-gpio": "0.0.6",
+    "bluebird": "~2.3.0"
   }
 }
