@@ -36,11 +36,11 @@ for player of player
   player.active = false
   player.buttonStatus = 0
 
-setupPromise = Promise.all(ledSetup).then ->
-  Promise.all(buttonSetup).then ->
-  , (e)->
+setupPromise = Promise.all(ledSetup).then (->
+  Promise.all(buttonSetup).then (->
+  ), (e)->
     console.log 'Failed setting up Button', e
-, (e)->
+), (e)->
   console.log 'Failed setting up LED', e
 
 poll = null
@@ -55,8 +55,8 @@ setupPromise.then ->
             player.active = !player.active
             return writePin player.led, player.active
 
-    Promise.all(readHandled).then ->
-    , (err)->
+    Promise.all(readHandled).then (->
+    ), (err)->
       console.log 'Error checking status', err
 
   , 10
@@ -70,9 +70,9 @@ process.on 'SIGINT', ->
       closePin player.led
     cleaned.push closePin player.button
 
-  Promise.all(cleaned).then ->
+  Promise.all(cleaned).then (->
     console.log 'Cleaned up pins';
-  , (err)->
+  ), (err)->
     console.log 'Failure cleaning up pins', err
 
   process.exit()
