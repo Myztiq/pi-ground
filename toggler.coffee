@@ -58,8 +58,8 @@ setupPromise.then ->
     Promise.all(readHandled).then (->
     ), (err)->
       console.log 'Error checking status', err
-
   , 10
+  console.log 'Setup'
 
 process.on 'SIGINT', ->
   console.log 'Cleaning up..'
