@@ -1,7 +1,7 @@
 gpio = require 'pi-gpio'
 
-pin = 7
-buttonPin = 11
+pin = 3
+buttonPin = 7
 
 poll = null
 
