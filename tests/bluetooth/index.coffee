@@ -21,6 +21,8 @@ bleno.on 'servicesSet', (err)->
   console.log 'Services Set'
   console.log err if err
 
+value = false
+
 bleno.on 'advertisingStart', (err)->
   if err
     console.log err
@@ -32,8 +34,13 @@ bleno.on 'advertisingStart', (err)->
       characteristics: [
         new bleno.Characteristic
           uuid: 'FF10'
-          properties: [ 'read' ]
-          value: false
+          properties: [ 'read', 'notify' ]
+          value: value
+          onSubscribe: (maxValueSize, updateValueCallback)->
+            # TODO - Get this moved out into separate files, and hooked up into the button/LED info. Perhaps even start figuring out users
+            console.log 'maxValueSize', maxValueSize
+            value = 'foo+' + Math.random()
+            updateValueCallback(new Buffer(value))
       ]
     bleno.setServices [primaryService], (err)->
       console.log 'Error setting services', err if err
