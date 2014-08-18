@@ -4,9 +4,22 @@ name = 'BGTimer';
 serviceUuids = ['FFF0']
 
 bleno.on 'stateChange', (state)->
-  console.log 'on -> stateChange: ' + state
+  console.log 'State changed to: ' + state
   bleno.startAdvertising name, serviceUuids, (err)->
     console.log err if err
+
+bleno.on 'accept', (clientAddr)->
+  console.log 'Accepted connection from ', clientAddr
+
+bleno.on 'disconnect', (clientAddr)->
+  console.log 'Client disconnected', clientAddr
+
+bleno.on 'rssiUpdate', (rssi)->
+  console.log 'RSSI Updated', rssi
+
+bleno.on 'servicesSet', (err)->
+  console.log 'Services Set'
+  console.log err if err
 
 bleno.on 'advertisingStart', (err)->
   if err
@@ -20,14 +33,15 @@ bleno.on 'advertisingStart', (err)->
         new bleno.Characteristic
           uuid: 'FF10'
           properties: [ 'read' ]
+          value: false
       ]
     bleno.setServices [primaryService], (err)->
-      console.log 'Set Services'
       console.log 'Error setting services', err if err
-
 
 bleno.on 'advertisingStartError', (err)->
 
 process.on 'SIGINT', ->
-  bleno.stopAdvertising()
-  process.exit()
+  bleno.stopAdvertising ()->
+    console.log ''
+    console.log 'Stopped Advertising'
+    process.exit()
