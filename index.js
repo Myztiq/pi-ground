@@ -1,2 +1,2 @@
 require('coffee-script/register');
-require('./blink');
+require('./game/index.coffee');

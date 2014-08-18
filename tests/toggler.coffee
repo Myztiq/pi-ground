@@ -56,10 +56,12 @@ openPin = (args...)->
 closePin = (args...)->
   taskRunner = taskRunner.then ->
     return new Promise (resolve, reject)->
-      console.log 'Close Pin', args
-      Promise.promisify(gpio.close)(args...).then resolve, (err)->
-        console.log 'Error opening pin ', args
-        resolve(err)
+      setTimeout ->
+        console.log 'Close Pin', args
+        Promise.promisify(gpio.close)(args...).then resolve, (err)->
+          console.log 'Error opening pin ', args
+          resolve(err)
+      , 100
 
 writePin = (args...)->
   taskRunner = taskRunner.then ->
@@ -80,10 +82,11 @@ readPin = (args...)->
 buttonSetup = []
 ledSetup = []
 for id, player of players
-  buttonSetup.push openPin(player.button, 'in down')
-  ledSetup.push openPin(player.led, 'out down')
-  player.active = false
-  player.buttonStatus = 0
+  do (id, player)->
+    buttonSetup.push openPin(player.button, 'in down')
+    ledSetup.push openPin(player.led, 'out up')
+    player.active = false
+    player.buttonStatus = 0
 
 setupPromise = Promise.all(ledSetup).then (->
   Promise.all(buttonSetup).then (->
@@ -101,12 +104,11 @@ setupPromise.then ->
       for id, player of players
         do (id, player)->
           readHandled.push readPin(player.button).then (val)->
-            console.log val
             if val != player.buttonStatus
               player.buttonStatus = val
               if player.buttonStatus == 0
                 player.active = !player.active
-                console.log "Toggling #{id} LED to ", player.active
+                console.log "Toggling Players #{id}'s LED to ", player.active
                 return writePin player.led, player.active
 
       Promise.all(readHandled).then (->
