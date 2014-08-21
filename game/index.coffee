@@ -1,5 +1,5 @@
-game = require './lib/game'
-player = require './lib/player'
+Game = require './lib/game'
+Player = require './lib/player'
 config = require './config'
 pinManager = require './lib/pinManager'
 Promise = require 'bluebird'
