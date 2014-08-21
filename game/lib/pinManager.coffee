@@ -1,4 +1,5 @@
 Promise = require 'bluebird'
+gpio = require 'pi-gpio'
 
 taskRunner = new Promise (resolve)-> resolve()
 
