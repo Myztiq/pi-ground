@@ -9,7 +9,7 @@ module.exports =
   openPin: (pin, val)->
     taskRunner = taskRunner.then ->
       return new Promise (resolve, reject)->
-        console.log 'Open Pin', args
+        console.log 'Open Pin', pin, val
         Promise.promisify(gpio.open)(pin, val).then (->
           openedPins[pin] = true
           resolve()
@@ -24,28 +24,28 @@ module.exports =
 
       return new Promise (resolve, reject)->
         setTimeout ->
-          console.log 'Close Pin', args
-          Promise.promisify(gpio.close)(args...).then (->
+          console.log 'Close Pin', pin
+          Promise.promisify(gpio.close)(pin).then (->
             delete openedPins[pin]
             resolve()
           ), (err)->
-            console.log 'Error opening pin ', args
+            console.log 'Error opening pin ', pin
             resolve(err)
         , 100
 
-  writePin: (args...)->
+  writePin: (pin, val)->
     taskRunner = taskRunner.then ->
       return new Promise (resolve, reject)->
-        console.log 'Write Pin', args
-        Promise.promisify(gpio.write)(args...).then resolve, (err)->
-          console.log 'Error writing pin ', args
+        console.log 'Write Pin', pin, val
+        Promise.promisify(gpio.write)(pin, val).then resolve, (err)->
+          console.log 'Error writing pin ', pin, val
           reject(err)
 
-  readPin: (args...)->
+  readPin: (pin)->
     taskRunner = taskRunner.then ->
       return new Promise (resolve, reject)->
-        Promise.promisify(gpio.read)(args...).then resolve, (err)->
-          console.log 'Error reading pin ', args
+        Promise.promisify(gpio.read)(pin).then resolve, (err)->
+          console.log 'Error reading pin ', pin
           reject(err)
 
   cleanup: ->
