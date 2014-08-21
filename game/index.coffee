@@ -7,7 +7,7 @@ Promise = require 'bluebird'
 poll = null
 
 # Setup our cleanup helpers. This is important, so if there is a crash we can try to exit cleanly
-exit = (err)->
+cleanup = (err)->
   if err?
     console.log 'Fatal Error', err
 
@@ -18,8 +18,9 @@ exit = (err)->
     console.log 'Cleaned up pins'
     process.exit()
 
-process.on 'uncaughtException', exit
-process.on 'SIGINT', exit
+
+process.on 'uncaughtException', cleanup
+process.on 'SIGINT', cleanup
 
 # Now setup all the button and LED pins.
 
@@ -28,10 +29,11 @@ buttons = {}
 for playerConfig in config.players
   buttons[playerConfig.button] = {}
   promises.push pinManager.openPin(playerConfig.button, 'in down')
-  promises.push pinManager.openPin(playerConfig.led, 'out up')
+  promises.push pinManager.openPin(playerConfig.led, 'out down')
+
 
 Promise.settle(promises).then (results)->
-  console.log 'Setup. ', results
+  console.log 'Setup.'
 
   ###
     Setup the game itself.
@@ -45,25 +47,36 @@ Promise.settle(promises).then (results)->
   game = new Game()
 
   ## Begin polling for button presses
-  runPoll: ->
+  runPoll = ->
     poll = setTimeout ->
       readHandled = []
+      # Loop through each button
       for buttonId, buttonStatus of buttons
         do (buttonId, buttonStatus)->
+          #Check the status
           readHandled.push pinManager.readPin(buttonId).then (val)->
+            # If it's depressed
             if val == 1
+              # It's the first depression
               if !buttons[buttonId].timer
                 buttons[buttonId].timer = new Date()
+
+              # It's still depressed! Is it long enough to trigger a hold?
               else if !buttons[buttonId].hold and (new Date() - buttons[buttonId].timer) > 1000
                 game.emit 'buttonHold', buttonId
                 buttons[buttonId].hold = true
 
+            # There is no button press. Was it just released?
             else if buttons[buttonId].timer?
+              #Oh, was it held?
               if (new Date() - buttons[buttonId].timer) > 1000
                 delete buttons[buttonId].timer
                 delete buttons[buttonId].hold
                 game.emit 'buttonRelease', buttonId
+
+              # It was not held, just a press!
               else
+                delete buttons[buttonId].timer
                 game.emit 'buttonPress', buttonId
 
       Promise.all(readHandled).then (->
@@ -82,7 +95,12 @@ Promise.settle(promises).then (results)->
 
   for playerConfig in config.players
     do ->
-      player = new Player playerConfig
+      player = new Player
+        id: playerConfig.id
+        button: playerConfig.button
+        led: playerConfig.led
+        game: game
+
       player.once 'buttonPress', ->
         game.addPlayer(player)
 

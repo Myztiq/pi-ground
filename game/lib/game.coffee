@@ -3,6 +3,10 @@
 class Game extends EventEmitter
   constructor: (options)->
     @_turnLimit = 2
+    @on 'buttonHold', =>
+      @pause()
+    @on 'buttonRelease', =>
+      @resume()
 
   _players: []
   _currentPlayer: null
@@ -29,10 +33,20 @@ class Game extends EventEmitter
         @_nextTurn()
 
   pause: ->
-    @_currentPlayer.pause()
+    @_currentPlayer?.pause()
+    leds = off
+    @blinky = setInterval =>
+      leds = !leds
+      for player in @_players
+        player.setLED(leds)
+    , 100
 
   resume: ->
-    @_currentPlayer.resume()
+    clearInterval @blinky
+    for player in @_players
+      player.setLED(false)
+    @_currentPlayer?.setLED true
+    @_currentPlayer?.resume()
 
   end: ->
     @_currentPlayer.cancelTurn()
