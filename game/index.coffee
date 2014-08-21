@@ -3,6 +3,7 @@ Player = require './lib/player'
 config = require './config'
 pinManager = require './lib/pinManager'
 Promise = require 'bluebird'
+bluetooth = require 'bluetooth'
 
 poll = null
 
@@ -93,6 +94,7 @@ Promise.settle(promises).then (results)->
       gameStarted = true
       game.start()
 
+  players = []
   for playerConfig in config.players
     do ->
       player = new Player
@@ -101,10 +103,14 @@ Promise.settle(promises).then (results)->
         led: playerConfig.led
         game: game
 
+      players.push player
+
       player.once 'buttonPress', ->
         game.addPlayer(player)
 
       player.once 'buttonRelease', -> startGame()
+
+  bluetooth.setup "BGTimer", players
 
 
 

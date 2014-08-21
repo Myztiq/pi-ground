@@ -14,10 +14,10 @@ class Player extends EventEmitter
         @emit 'buttonPress'
 
     @on 'buttonPress', =>
-      @setLED !@_ledStatus
+      @setLED !@ledStatus
 
   _turns: []
-  _ledStatus: false
+  ledStatus: false
   _running: false
   _gameTimer: null
 
@@ -45,8 +45,9 @@ class Player extends EventEmitter
     @_currentTurn = null
 
   setLED: (val)->
-    @_ledStatus = val
+    @ledStatus = val
     pinManager.writePin(@_ledPin, !val)
+    @emit 'ledChange', @ledStatus
 
   cancelTurn: ()->
     delete @_turns[@_turns.length-1]
