@@ -30,7 +30,7 @@ for playerConfig in config.players
   promises.push pinManager.openPin(playerConfig.button, 'in down')
   promises.push pinManager.openPin(playerConfig.led, 'out up')
 
-Promise.settled(promises).then (results)->
+Promise.settle(promises).then (results)->
   console.log 'Setup. ', results
 
   ###
