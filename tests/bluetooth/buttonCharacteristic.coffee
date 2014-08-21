@@ -5,19 +5,18 @@ class Characteristic extends bleno.Characteristic
 
     config =
       uuid: 'fffffffffffffffffffffffffffffff1', # or 'fff1' for 16-bit
-      properties: [ 'read' ]
-      value: null, # optional static value, must be of type Buffer
+      properties: [ 'read', 'notify' ]
+      value: @value # optional static value, must be of type Buffer
       descriptors: [
         # see Descriptor for data type
       ],
-      onReadRequest: (offset, cb)-> # optional read request handler, function(offset, callback) { ... }
-        console.log offset
-        cb?(true)
+      onReadRequest: (offset, cb)=>
+        cb?(new Buffer @value)
 
-#      onWriteRequest: null, # optional write request handler, function(data, offset, withoutResponse, callback) { ...}
-#      onSubscribe: null, # optional notify subscribe handler, function(maxValueSize, updateValueCallback) { ...}
-#      onUnsubscribe: null, # optional notify unsubscribe handler, function() { ...}
-#      onNotify: null # optional notify sent handler, function() { ...}
+      onSubscribe: (maxValueSize, updateValueCallback)->
+        @set 'notifyOnChange', updateValueCallback
 
-    
+        updateValueCallback(new Buffer(value))
     @_super(config)
+
+  value: false
