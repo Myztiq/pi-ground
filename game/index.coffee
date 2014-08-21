@@ -3,7 +3,7 @@ Player = require './lib/player'
 config = require './config'
 pinManager = require './lib/pinManager'
 Promise = require 'bluebird'
-bluetooth = require 'bluetooth'
+bluetooth = require './bluetooth/index'
 
 poll = null
 
