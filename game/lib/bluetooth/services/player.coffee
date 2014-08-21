@@ -3,7 +3,7 @@ bleno = require 'bleno'
 ButtonPressCharacteristic = require '../characteristics/buttonPress'
 LEDCharacteristic = require '../characteristics/led'
 
-class ButtonService extends bleno.PrimaryService
+class PlayerService extends bleno.PrimaryService
 
   constructor: (options)->
     configuration =
@@ -16,4 +16,6 @@ class ButtonService extends bleno.PrimaryService
           player: options.player
           prefix: options.prefix
       ]
-    @_super configuration
+    super configuration
+
+module.exports = PlayerService

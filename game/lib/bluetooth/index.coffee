@@ -16,6 +16,7 @@ module.exports =
         serviceId: "1#{player.id}00"
 
     bleno.on 'advertisingStart', (err)->
+      console.log 'Started Advertising'
       bleno.setServices services, (err)->
         if err
           console.log 'Error setting services', err
@@ -25,8 +26,6 @@ module.exports =
     bleno.startAdvertising name, serviceUuids, (err)->
       if err
         console.log err
-      else
-        console.log 'Started Advertising'
 
 bleno.on 'stateChange', (state)->
   console.log 'State changed to: ' + state
@@ -39,9 +38,3 @@ bleno.on 'disconnect', (clientAddr)->
 
 bleno.on 'rssiUpdate', (rssi)->
   console.log 'RSSI Updated', rssi
-
-bleno.on 'servicesSet', (err)->
-  if err
-    console.log 'Error setting services', err
-  else
-    console.log 'Services Set'

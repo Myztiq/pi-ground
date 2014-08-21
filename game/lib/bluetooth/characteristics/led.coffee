@@ -22,6 +22,8 @@ class Characteristic extends bleno.Characteristic
       onReadRequest: (offset, callback)->
         callback(new Buffer(player.ledStatus))
 
-    @_super(config)
+    super(config)
 
   value: false
+
+module.exports = Characteristic

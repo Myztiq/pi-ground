@@ -3,14 +3,13 @@ Player = require './lib/player'
 config = require './config'
 pinManager = require './lib/pinManager'
 Promise = require 'bluebird'
-bluetooth = require './bluetooth/index'
+bluetooth = require './lib/bluetooth/index'
 
 poll = null
 
 # Setup our cleanup helpers. This is important, so if there is a crash we can try to exit cleanly
 cleanup = (err)->
-  if err?
-    console.log 'Fatal Error', err
+  console.log 'Fatal Error', err if err?
 
   console.log 'Cleaning up..'
   clearTimeout(poll)

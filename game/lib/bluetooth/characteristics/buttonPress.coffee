@@ -17,6 +17,8 @@ class Characteristic extends bleno.Characteristic
       onWriteRequest: ->
         player.emit 'buttonPress'
 
-    @_super(config)
+    super(config)
 
   value: false
+
+module.exports = Characteristic
