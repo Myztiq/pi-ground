@@ -9,7 +9,9 @@ poll = null
 
 # Setup our cleanup helpers. This is important, so if there is a crash we can try to exit cleanly
 cleanup = (err)->
-  console.log 'Fatal Error', err if err?
+  if err?
+    console.log 'Fatal Error', err
+    throw err
 
   console.log 'Cleaning up..'
   clearTimeout(poll)

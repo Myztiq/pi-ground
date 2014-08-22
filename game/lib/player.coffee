@@ -45,6 +45,7 @@ class Player extends EventEmitter
     @_currentTurn = null
 
   setLED: (val)->
+    console.log 'Set LED to ', val
     @ledStatus = val
     pinManager.writePin(@_ledPin, !val)
     @emit 'ledChange', @ledStatus

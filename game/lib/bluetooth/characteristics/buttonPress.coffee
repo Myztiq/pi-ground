@@ -15,10 +15,11 @@ class Characteristic extends bleno.Characteristic
       ],
       onSubscribe: (maxValueSize, updateValueCallback)->
         player.on 'buttonPress', ->
-          updateValueCallback(new Buffer(true))
+          updateValueCallback(new Buffer("#{true}"))
 
-      onWriteRequest: ->
+      onWriteRequest: (data, offset, withoutResponse, callback)=>
         player.emit 'buttonPress'
+        callback?(bleno.Characteristic.RESULT_SUCCESS)
 
     super(config)
 

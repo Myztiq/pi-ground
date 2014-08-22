@@ -16,14 +16,23 @@ class Characteristic extends bleno.Characteristic
       ]
       onSubscribe: (maxValueSize, updateValueCallback)->
         player.on 'ledChange', (val)->
-          updateValueCallback(new Buffer(val))
+          updateValueCallback(new Buffer("#{val}"))
 
-      onWriteRequest: (data, offset, withoutResponse, callback)->
+      onWriteRequest: (data, offset, withoutResponse, callback)=>
+        data = data.toString()
+        if data == 'true'
+          data = true
+        else if data == 'false'
+          data = false
+
+        console.log 'Setting LED to: ', data
+
         player.setLED(data)
-        callback?()
+        callback?(bleno.Characteristic.RESULT_SUCCESS)
 
       onReadRequest: (offset, callback)->
-        callback(new Buffer(player.ledStatus))
+        console.log 'READ REQUEST!', bleno.Characteristic.RESULT_SUCCESS
+        callback(bleno.Characteristic.RESULT_SUCCESS, new Buffer("#{player.ledStatus}"))
 
     super(config)
 
