@@ -1,4 +1,5 @@
 bleno = require 'bleno'
+Descriptor = bleno.Descriptor;
 
 class Characteristic extends bleno.Characteristic
   constructor: (options)->
@@ -9,8 +10,10 @@ class Characteristic extends bleno.Characteristic
       properties: [ 'notify', 'write', 'read', 'writeWithoutResponse' ]
       value: player.ledStatus
       descriptors: [
-        # see Descriptor for data type
-      ],
+        new Descriptor
+          uuid: options.prefix + "12"
+          value: 'LED'
+      ]
       onSubscribe: (maxValueSize, updateValueCallback)->
         player.on 'ledChange', (val)->
           updateValueCallback(new Buffer(val))

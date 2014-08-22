@@ -1,4 +1,5 @@
 bleno = require 'bleno'
+Descriptor = bleno.Descriptor;
 
 class Characteristic extends bleno.Characteristic
   constructor: (options)->
@@ -8,7 +9,9 @@ class Characteristic extends bleno.Characteristic
       uuid: options.prefix + "01"
       properties: [ 'notify', 'writeWithoutResponse' ]
       descriptors: [
-        # see Descriptor for data type
+        new Descriptor
+          uuid: options.prefix + "11"
+          value: 'buttonPress'
       ],
       onSubscribe: (maxValueSize, updateValueCallback)->
         player.on 'buttonPress', ->

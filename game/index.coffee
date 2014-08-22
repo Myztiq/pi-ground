@@ -83,7 +83,7 @@ Promise.settle(promises).then (results)->
         runPoll()
       ), (err)->
         console.log 'Error checking status', err
-    , 100
+    , 50
 
   runPoll()
 
