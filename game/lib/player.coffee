@@ -3,14 +3,14 @@ pinManager = require './pinManager.coffee'
 
 class Player extends EventEmitter
   constructor: (options)->
-    @_id = options.id
+    @id = options.id
     @_ledPin = options.led
     @_buttonPin = options.button
     @_game = options.game
 
     @_game.on 'buttonPress', (pin)=>
       if pin == "#{@_buttonPin}"
-        console.log "Player #{@_id}'s button pressed!"
+        console.log "Player #{@id}'s button pressed!"
         @emit 'buttonPress'
 
     @on 'buttonPress', =>
@@ -40,7 +40,7 @@ class Player extends EventEmitter
   endTurn: ()->
     @_currentTurn.end = new Date()
     @_turns.push @_currentTurn
-    console.log "Player #{@_id}'s turn length: #{@_currentTurn.end - @_currentTurn.start}ms"
+    console.log "Player #{@id}'s turn length: #{@_currentTurn.end - @_currentTurn.start}ms"
     @setLED(false)
     @_currentTurn = null
 
