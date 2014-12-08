@@ -1,11 +1,12 @@
 bleno = require('bleno')
 PlayerService = require './services/player'
+GameService = require './services/game'
 
 process.on 'exit', -> bleno.stopAdvertising()
 
 
 module.exports =
-  setup: (name, players)->
+  setup: (name, players, game)->
     serviceUuids = []
     services = []
     for player in players
@@ -14,6 +15,8 @@ module.exports =
         player: player
         prefix: "2#{player.id}"
         serviceId: "1#{player.id}00"
+
+    services.push new GameService(game)
 
     bleno.on 'advertisingStart', (err)->
       console.log 'Started Advertising'
@@ -26,6 +29,7 @@ module.exports =
     bleno.startAdvertising name, serviceUuids, (err)->
       if err
         console.log err
+    return bleno
 
 bleno.on 'stateChange', (state)->
   console.log 'State changed to: ' + state

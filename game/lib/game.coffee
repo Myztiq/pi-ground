@@ -1,7 +1,7 @@
 {EventEmitter} = require 'events'
 
 class Game extends EventEmitter
-  constructor: (options)->
+  constructor: ->
     @_turnLimit = 2
     @on 'buttonHold', =>
       @pause()
@@ -9,25 +9,38 @@ class Game extends EventEmitter
       @resume()
 
   _players: []
+
+  _playerOrder: []
+  _playerOrderIndex: 0
   _currentPlayer: null
+  _round: 0
+  _roundLimit: 2
   _totalTurns: 0
-  _turnLimit: -1
 
   addPlayer: (playerInstance)->
     @_players.push playerInstance
 
-  start: ->
-    @_currentPlayer = 0
-    @_nextTurn()
+  start: (order)->
+    @startRound(order)
+
+  startRound: (order)->
+    @_playerOrder = order
+    if @_round > @_roundLimit
+      @end()
+    else
+      @_playerOrderIndex = -1
+      @_round++
+      @_nextTurn()
 
   _nextTurn: ->
     @_totalTurns++
-    @_currentPlayer = @_players[@_currentPlayer % @_players.length]
-    @_currentPlayer.startTurn()
-    @_currentPlayer.one 'buttonPress', =>
-      if @_turnLimit > 0 and @_turnLimit > @_totalTurns
-        @end()
-      else
+    @_playerOrderIndex++
+    if @_playerOrderIndex > @_playerOrder.length
+      @startRound(@_playerOrder)
+    else
+      @_currentPlayer = @_playerOrder[@_playerOrderIndex]
+      @_currentPlayer.startTurn()
+      @_currentPlayer.one 'buttonPress', =>
         @_currentPlayer.stopTurn()
         @_currentPlayer++
         @_nextTurn()

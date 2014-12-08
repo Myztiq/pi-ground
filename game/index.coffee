@@ -89,12 +89,6 @@ Promise.settle(promises).then (results)->
 
   runPoll()
 
-  gameStarted = false
-  startGame = ->
-    if !gameStarted
-      gameStarted = true
-      game.start()
-
   players = []
   for playerConfig in config.players
     do ->
@@ -106,12 +100,50 @@ Promise.settle(promises).then (results)->
 
       players.push player
 
-      player.once 'buttonPress', ->
-        game.addPlayer(player)
+  connection = bluetooth.setup "BGTimer", players, game
 
-      player.once 'buttonRelease', -> startGame()
+  # Wait for bluetooth connection. On connection animate all the players.
+  connection.on 'accept', ->
+    # We have a bluetooth connection. Animate all the players.
 
-  bluetooth.setup "BGTimer", players
+    animate = ->
+      animationSpeed = 500
+      # We need a promise to chain for timing
+      animationPromise = Promise.cancellable().resolve()
+      for player in players
+        animationPromise = animationPromise.delay(animationSpeed).then ->
+          player.setLED(true)
 
+      for player in players
+        animationPromise = animationPromise.delay(animationSpeed).then ->
+          player.setLED(false)
+      return animationPromise.then -> animate()
 
+    animation = animate()
 
+    # Wait for player add mode.
+    game.once 'startAddPlayers', ->
+      animation.cancel()
+      for player in players
+        player.setLED(true)
+
+      game.on 'addPlayer', (id)->
+        for player in players
+          if player.id == id
+            player.added = true
+            player.setLED(false)
+            game.addPlayer(player)
+
+      game.on 'startPickOrder', ->
+        order = []
+        for player in players
+          if player.added
+            player.setLED(true)
+            player.on 'buttonPress', ->
+              if !player.orderSet
+                player.setLED(false)
+                player.orderSet = true
+                order.push player
+
+        game.on 'startGame', ->
+          game.start(order)
