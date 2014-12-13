@@ -1,7 +1,8 @@
 Promise = require 'bluebird'
 gpio = require 'pi-gpio'
+winston = require 'winston'
 
-taskRunner = new Promise (resolve)-> resolve()
+taskRunner = new Promise (resolve)-> resolve().cancellable()
 
 openedPins = {}
 
@@ -11,48 +12,48 @@ module.exports =
       taskRunner = taskRunner.then ->
         Promise.promisify(gpio.open)(pin, val).then (->
           openedPins[pin] = true
-          console.log 'Opened pin', pin, val
+          winston.log 'debug', 'Opened pin', pin, val
           resolve()
         ), (err)->
           openedPins[pin] = false
-          console.log 'Error opening pin ', pin, val
+          winston.log 'debug', 'Error opening pin ', pin, val
           resolve(err)
 
   closePin: (pin)->
-    console.log 'Closing pin ', pin
     return new Promise (resolve, reject)->
       taskRunner = taskRunner.then ->
-        console.log 'Actually closing pin', pin
+        winston.log 'debug', 'Actually closing pin', pin
         if !openedPins[pin]
           console.warn 'Trying to close pin that was never properly opened. ', pin
 
         Promise.promisify(gpio.close)(pin).then (->
-          console.log 'Closed pin', pin
+          winston.log 'debug', 'Closed pin', pin
           resolve()
         ), (err)->
-          console.log 'Error closing pin ', pin
+          winston.log 'debug', 'Error closing pin ', pin
           resolve(err)
 
   writePin: (pin, val)->
     return new Promise (resolve, reject)->
-      console.log 'Write Pin', pin, val
+      winston.log 'debug', 'Write Pin', pin, val
       Promise.promisify(gpio.write)(pin, val).then resolve, (err)->
-        console.log 'Error writing pin ', pin, val
+        winston.log 'debug', 'Error writing pin ', pin, val
         reject(err)
 
   readPin: (pin)->
     return new Promise (resolve, reject)->
       taskRunner = taskRunner.then ->
         Promise.promisify(gpio.read)(pin).then resolve, (err)->
-          console.log 'Error reading pin ', pin
+          winston.log 'debug', 'Error reading pin ', pin
           reject(err)
 
   cleanup: ->
     return new Promise (resolve, reject)=>
-      taskRunner = taskRunner.then =>
-        promises = []
-        for pin, val of openedPins
-          promises.push @closePin(pin)
+      taskRunner.cancel()
+      promises = []
+      for pin, val of openedPins
+        do (pin)=>
+          promises.push @writePin(pin, true).then =>
+            @closePin(pin)
 
-
-        Promise.settle(promises).then resolve, resolve
+      Promise.settle(promises).then resolve, resolve

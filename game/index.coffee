@@ -1,23 +1,25 @@
+winston = require 'winston'
+#winston.setLevels(winston.config.syslog.levels);
 Game = require './lib/game'
 Player = require './lib/player'
 config = require './config'
 pinManager = require './lib/pinManager'
 Promise = require 'bluebird'
 bluetooth = require './lib/bluetooth/index'
+animations = require './lib/animations'
 
 poll = null
 
 # Setup our cleanup helpers. This is important, so if there is a crash we can try to exit cleanly
 cleanup = (err)->
   if err?
-    console.log 'Fatal Error', err
+    winston.log 'error', err
     throw err
 
-  console.log 'Cleaning up..'
+  winston.log 'debug', 'Cleaning up'
   clearTimeout(poll)
   pinManager.cleanup().then (results)->
-    console.log results
-    console.log 'Cleaned up pins'
+    winston.log 'debug', 'Cleaned up pins'
     process.exit()
 
 
@@ -35,7 +37,7 @@ for playerConfig in config.players
 
 
 Promise.settle(promises).then (results)->
-  console.log 'Setup.'
+  winston.log 'info', 'Setup.'
 
   ###
     Setup the game itself.
@@ -84,7 +86,7 @@ Promise.settle(promises).then (results)->
       Promise.all(readHandled).then (->
         runPoll()
       ), (err)->
-        console.log 'Error checking status', err
+        winston.log 'error', 'Error checking status', err
     , 50
 
   runPoll()
@@ -102,26 +104,16 @@ Promise.settle(promises).then (results)->
 
   connection = bluetooth.setup "BGTimer", players, game
 
+  animation = animations.blink(players)
+
   # Wait for bluetooth connection. On connection animate all the players.
   connection.on 'accept', ->
+    animation.cancel()
+
     # We have a bluetooth connection. Animate all the players.
+    animation = animations.rotate(players)
 
-    animate = ->
-      animationSpeed = 500
-      # We need a promise to chain for timing
-      animationPromise = Promise.cancellable().resolve()
-      for player in players
-        animationPromise = animationPromise.delay(animationSpeed).then ->
-          player.setLED(true)
-
-      for player in players
-        animationPromise = animationPromise.delay(animationSpeed).then ->
-          player.setLED(false)
-      return animationPromise.then -> animate()
-
-    animation = animate()
-
-    # Wait for player add mode.
+  # Wait for player add mode.
     game.once 'startAddPlayers', ->
       animation.cancel()
       for player in players

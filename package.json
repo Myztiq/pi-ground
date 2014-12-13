@@ -16,11 +16,12 @@
     "url": "https://github.com/Myztiq/pi-ground/issues"
   },
   "dependencies": {
-    "coffee-script": "~1.7.1",
-    "pi-gpio": "0.0.6",
+    "bleno": "~0.1.5",
     "bluebird": "~2.3.0",
-    "rpi-gpio": "~0.5.0",
+    "coffee-script": "~1.7.1",
     "noble": "~0.3.4",
-    "bleno": "~0.1.5"
+    "pi-gpio": "0.0.6",
+    "rpi-gpio": "~0.5.0",
+    "winston": "^0.8.3"
   }
 }

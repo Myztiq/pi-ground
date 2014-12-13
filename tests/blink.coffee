@@ -1,6 +1,6 @@
 gpio = require 'pi-gpio'
 
-pin = 23
+pin = 38
 
 gpio.open pin, 'out up', (err)->
   if err

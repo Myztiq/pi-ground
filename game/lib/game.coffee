@@ -1,3 +1,4 @@
+winston = require 'winston'
 {EventEmitter} = require 'events'
 
 class Game extends EventEmitter
@@ -63,6 +64,6 @@ class Game extends EventEmitter
 
   end: ->
     @_currentPlayer.cancelTurn()
-    console.log 'Game END!'
+    winston.log 'info', 'Game END!'
 
 module.exports = Game

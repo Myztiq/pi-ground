@@ -1,5 +1,6 @@
 {EventEmitter} = require 'events'
 pinManager = require './pinManager.coffee'
+winston = require 'winston'
 
 class Player extends EventEmitter
   constructor: (options)->
@@ -10,7 +11,7 @@ class Player extends EventEmitter
 
     @_game.on 'buttonPress', (pin)=>
       if pin == "#{@_buttonPin}"
-        console.log "Player #{@id}'s button pressed!"
+        winston.log 'debug', "Player #{@id}'s button pressed!"
         @emit 'buttonPress'
 
     @on 'buttonPress', =>
@@ -28,8 +29,8 @@ class Player extends EventEmitter
     @_gameTimer = new Date()
 
   end: ->
-    console.log 'Game Ended!'
-    console.log new Date() - @_gameTimer
+    winston.log 'debug', 'Game Ended!'
+    winston.log 'debug', new Date() - @_gameTimer
 
   startTurn: ()->
     @_currentTurn =
@@ -40,12 +41,12 @@ class Player extends EventEmitter
   endTurn: ()->
     @_currentTurn.end = new Date()
     @_turns.push @_currentTurn
-    console.log "Player #{@id}'s turn length: #{@_currentTurn.end - @_currentTurn.start}ms"
+    winston.log 'debug', "Player #{@id}'s turn length: #{@_currentTurn.end - @_currentTurn.start}ms"
     @setLED(false)
     @_currentTurn = null
 
   setLED: (val)->
-    console.log 'Set LED to ', val
+    winston.log 'debug', 'Set LED to ', val
     @ledStatus = val
     pinManager.writePin(@_ledPin, !val)
     @emit 'ledChange', @ledStatus

@@ -2,32 +2,32 @@ module.exports =
   players: [
     {
       id: 1
-      led: 23
-      button: 24
+      led: 38
+      button: 40
     }
     {
       id: 2
-      led: 11
-      button: 10
+      led: 32
+      button: 7
     }
     {
       id: 3
-      led: 15
-      button: 16
+      led: 24
+      button: 23
     }
     {
       id: 4
-      led: 21
-      button: 22
+      led: 18
+      button: 37
     }
     {
       id: 5
-      led: 7
-      button: 8
+      led: 36
+      button: 31
     }
     {
       id: 6
-      led: 13
-      button: 12
+      led: 26
+      button: 29
     }
   ]
